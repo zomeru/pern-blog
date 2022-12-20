@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "apollo-server": "^3.11.1",
-    "graphql": "^16.6.0"
+    "graphql": "^16.6.0",
+    "prisma": "^4.7.1"
   },
   "devDependencies": {
     "@typescript-eslint/parser": "^5.47.0",
