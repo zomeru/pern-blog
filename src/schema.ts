@@ -9,6 +9,7 @@ export const typeDefs = gql`
   type Mutation {
     postCreate(post: PostInput!): PostPayload!
     postUpdate(postId: ID!, post: PostInput!): PostPayload!
+    postDelete(postId: ID!): PostPayload!
   }
 
   type Post {
@@ -39,7 +40,7 @@ export const typeDefs = gql`
   }
 
   type PostPayload {
-    userError: [UserError!]!
+    userErrors: [UserError!]!
     post: Post
   }
 
