@@ -1,4 +1,4 @@
-import type { Context } from 'src';
+import type { Context } from '..';
 
 interface UserParent {
   id: number;

@@ -28,7 +28,7 @@ export const Query = {
 
     return profile;
   },
-  posts: (_: any, __: any, { prisma }: Context) => {
+  posts: async (_: any, __: any, { prisma }: Context) => {
     return prisma.post.findMany({
       where: {
         published: true,

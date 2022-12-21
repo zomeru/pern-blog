@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import JWT from 'jsonwebtoken';
 
-import type { Context } from 'src';
+import type { Context } from '../..';
 import { emailValidator } from '../../utils';
 
 interface CredentialsInput {

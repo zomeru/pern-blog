@@ -6,7 +6,7 @@ import { typeDefs } from './schema';
 import { Query, Mutation, Profile, Post, User } from './resolvers';
 import { getUserFromToken } from './utils';
 
-const prisma = new PrismaClient();
+export const prisma = new PrismaClient();
 
 export interface Context {
   prisma: typeof prisma;
