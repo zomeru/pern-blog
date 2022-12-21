@@ -3,7 +3,9 @@ import gql from 'graphql-tag';
 export const typeDefs = gql`
   type Query {
     hello: String!
+    me: User
     posts: [Post!]!
+    profile(userId: ID!): Profile
   }
 
   type Mutation {
@@ -33,7 +35,7 @@ export const typeDefs = gql`
     id: ID!
     name: String!
     email: String!
-    profile: Profile!
+    # profile: Profile!
     posts: [Post!]!
   }
 
