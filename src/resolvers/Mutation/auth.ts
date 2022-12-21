@@ -1,5 +1,5 @@
-import type { User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import JWT from 'jsonwebtoken';
 
 import type { Context } from 'src';
 import { emailValidator } from '../../utils';
@@ -16,7 +16,7 @@ interface UserPayload {
   userErrors: {
     message: string;
   }[];
-  user: User | null;
+  token: string | null;
 }
 
 export const authResolvers = {
@@ -29,28 +29,28 @@ export const authResolvers = {
     if (!validEmail) {
       return {
         userErrors: [{ message: 'Invalid email address' }],
-        user: null,
+        token: null,
       };
     }
 
     if (password !== passwordConfirm) {
       return {
         userErrors: [{ message: 'Passwords do not match' }],
-        user: null,
+        token: null,
       };
     }
 
     if (password.length < 8) {
       return {
         userErrors: [{ message: 'Password must be at least 8 characters' }],
-        user: null,
+        token: null,
       };
     }
 
     if (!name || !bio) {
       return {
         userErrors: [{ message: 'Name and bio are required' }],
-        user: null,
+        token: null,
       };
     }
 
@@ -69,9 +69,15 @@ export const authResolvers = {
       },
     });
 
+    const JWT_SECRET = process.env.JWT_SECRET as string;
+
+    const token = JWT.sign({ userId: user.id }, JWT_SECRET, {
+      expiresIn: '7 days',
+    });
+
     return {
       userErrors: [],
-      user,
+      token,
     };
   },
 };
