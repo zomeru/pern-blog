@@ -145,6 +145,12 @@ export const postResolvers = {
       prisma,
     });
 
+    console.log({
+      postId,
+      userAuthorized,
+      userInfo,
+    });
+
     if (!postId || !userAuthorized || !userInfo) {
       return {
         userErrors: [{ message: "Something wen't wrong." }],

@@ -33,6 +33,8 @@ const main = async () => {
         req.headers.authorization as string
       );
 
+      console.log('userInfo', userInfo);
+
       return {
         prisma,
         userInfo,
