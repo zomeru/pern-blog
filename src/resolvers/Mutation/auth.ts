@@ -4,9 +4,13 @@ import JWT from 'jsonwebtoken';
 import type { Context } from 'src';
 import { emailValidator } from '../../utils';
 
-interface SignupArgs {
+interface CredentialsInput {
   email: string;
   password: string;
+}
+
+interface SignupArgs {
+  credentials: CredentialsInput;
   passwordConfirm: string;
   name: string;
   bio: string;
@@ -22,9 +26,11 @@ interface UserPayload {
 export const authResolvers = {
   signup: async (
     _: any,
-    { email, password, passwordConfirm, name, bio }: SignupArgs,
+    { credentials, passwordConfirm, name, bio }: SignupArgs,
     { prisma }: Context
   ): Promise<UserPayload> => {
+    const { email, password } = credentials;
+
     const validEmail = emailValidator(email);
     if (!validEmail) {
       return {
@@ -68,6 +74,46 @@ export const authResolvers = {
         },
       },
     });
+
+    const JWT_SECRET = process.env.JWT_SECRET as string;
+
+    const token = JWT.sign({ userId: user.id }, JWT_SECRET, {
+      expiresIn: '7 days',
+    });
+
+    return {
+      userErrors: [],
+      token,
+    };
+  },
+  signin: async (
+    _: any,
+    { credentials }: { credentials: CredentialsInput },
+    { prisma }: Context
+  ): Promise<UserPayload> => {
+    const { email, password } = credentials;
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    const invalidMessage = 'Invalid email or password';
+
+    if (!user) {
+      return {
+        userErrors: [{ message: invalidMessage }],
+        token: null,
+      };
+    }
+
+    const passwordMatched = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatched) {
+      return {
+        userErrors: [{ message: invalidMessage }],
+        token: null,
+      };
+    }
 
     const JWT_SECRET = process.env.JWT_SECRET as string;
 

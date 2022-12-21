@@ -15,8 +15,16 @@ export const postResolvers = {
   postCreate: async (
     _: any,
     { post }: { post: PostArgs },
-    { prisma }: Context
+    { prisma, userInfo }: Context
   ): Promise<PostPayloadType> => {
+    console.log('userInfo postCreate', userInfo);
+    if (!userInfo) {
+      return {
+        userErrors: [{ message: 'You must be logged in to create a post' }],
+        post: null,
+      };
+    }
+
     const { title, content } = post;
 
     if (!title || !content) {
@@ -32,7 +40,7 @@ export const postResolvers = {
         data: {
           title,
           content,
-          authorId: 1,
+          authorId: userInfo.userId,
         },
       }),
     };
