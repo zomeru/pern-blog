@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server';
+import gql from 'graphql-tag';
 
 export const typeDefs = gql`
   type Query {
@@ -10,6 +10,7 @@ export const typeDefs = gql`
     postCreate(post: PostInput!): PostPayload!
     postUpdate(postId: ID!, post: PostInput!): PostPayload!
     postDelete(postId: ID!): PostPayload!
+    postPublish(postId: ID!, isPublish: Boolean): PostPayload!
     signup(
       credentials: CredentialsInput!
       passwordConfirm: String!

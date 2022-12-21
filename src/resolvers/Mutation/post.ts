@@ -1,5 +1,6 @@
 import type { Post, Prisma } from '@prisma/client';
 import type { Context } from 'src';
+import { canUserMutatePost } from '../../utils';
 
 interface PostArgs {
   title: string;
@@ -17,7 +18,6 @@ export const postResolvers = {
     { post }: { post: PostArgs },
     { prisma, userInfo }: Context
   ): Promise<PostPayloadType> => {
-    console.log('userInfo postCreate', userInfo);
     if (!userInfo) {
       return {
         userErrors: [{ message: 'You must be logged in to create a post' }],
@@ -48,11 +48,17 @@ export const postResolvers = {
   postUpdate: async (
     _: any,
     { postId, post }: { postId: string; post: PostArgs },
-    { prisma }: Context
+    { prisma, userInfo }: Context
   ): Promise<PostPayloadType> => {
     const { title, content } = post;
 
-    if (!postId) {
+    const userAuthorized = await canUserMutatePost({
+      userId: userInfo?.userId as number,
+      postId: Number(postId),
+      prisma,
+    });
+
+    if (!postId || !userAuthorized) {
       return {
         userErrors: [{ message: "Something wen't wrong." }],
         post: null,
@@ -93,9 +99,15 @@ export const postResolvers = {
   postDelete: async (
     _: any,
     { postId }: { postId: string },
-    { prisma }: Context
+    { prisma, userInfo }: Context
   ): Promise<PostPayloadType> => {
-    if (!postId) {
+    const userAuthorized = await canUserMutatePost({
+      userId: userInfo?.userId as number,
+      postId: Number(postId),
+      prisma,
+    });
+
+    if (!postId || !userAuthorized) {
       return {
         userErrors: [{ message: "Something wen't wrong." }],
         post: null,
@@ -120,6 +132,45 @@ export const postResolvers = {
     return {
       userErrors: [],
       post: null,
+    };
+  },
+  postPublish: async (
+    _: any,
+    { postId, isPublish }: { postId: number; isPublish: boolean },
+    { prisma, userInfo }: Context
+  ) => {
+    const userAuthorized = await canUserMutatePost({
+      userId: userInfo?.userId as number,
+      postId: Number(postId),
+      prisma,
+    });
+
+    if (!postId || !userAuthorized || !userInfo) {
+      return {
+        userErrors: [{ message: "Something wen't wrong." }],
+        post: null,
+      };
+    }
+
+    const postExists = await prisma.post.findUnique({
+      where: { id: Number(postId) },
+    });
+
+    if (!postExists) {
+      return {
+        userErrors: [{ message: 'Post does not exist' }],
+        post: null,
+      };
+    }
+
+    return {
+      userErrors: [],
+      post: prisma.post.update({
+        where: { id: Number(postId) },
+        data: {
+          published: isPublish,
+        },
+      }),
     };
   },
 };
