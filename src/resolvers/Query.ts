@@ -1,4 +1,4 @@
-import type { Context } from 'src';
+import type { Context } from '..';
 
 export const Query = {
   hello: () => 'Hello World!',
@@ -28,7 +28,11 @@ export const Query = {
 
     return profile;
   },
-  posts: async (_: any, __: any, { prisma }: Context) => {
+  posts: async (
+    _: any,
+    { skip, take }: { skip: number; take: number },
+    { prisma }: Context
+  ) => {
     return prisma.post.findMany({
       where: {
         published: true,
@@ -38,6 +42,8 @@ export const Query = {
           createdAt: 'desc',
         },
       ],
+      skip,
+      take,
     });
   },
 };

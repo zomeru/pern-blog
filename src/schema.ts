@@ -4,7 +4,7 @@ export const typeDefs = gql`
   type Query {
     hello: String!
     me: User
-    posts: [Post!]!
+    posts(skip: Int!, take: Int!): [Post!]!
     profile(userId: ID!): Profile
   }
 
@@ -36,7 +36,7 @@ export const typeDefs = gql`
     name: String!
     email: String!
     # profile: Profile!
-    posts: [Post!]!
+    posts(skip: Int!, take: Int!): [Post!]!
   }
 
   type Profile {

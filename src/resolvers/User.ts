@@ -5,7 +5,11 @@ interface UserParent {
 }
 
 export const User = {
-  posts: (parent: UserParent, __: any, { prisma, userInfo }: Context) => {
+  posts: (
+    parent: UserParent,
+    { skip, take }: { skip: number; take: number },
+    { prisma, userInfo }: Context
+  ) => {
     const isOwnProfile = parent.id === userInfo?.userId;
 
     if (isOwnProfile) {
@@ -18,6 +22,8 @@ export const User = {
             createdAt: 'desc',
           },
         ],
+        skip,
+        take,
       });
     }
 
@@ -31,6 +37,8 @@ export const User = {
           createdAt: 'desc',
         },
       ],
+      skip,
+      take,
     });
   },
 };
